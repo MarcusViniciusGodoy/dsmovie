@@ -23,13 +23,12 @@ public class UserService implements UserDetailsService {
 	@Autowired
 	private CustomUserUtil userUtil;
 
-	public UserEntity authenticated() {
+	protected UserEntity authenticated(){
 		try {
 			String username = userUtil.getLoggedUsername();
 			return repository.findByUsername(username).get();
-		}
-		catch (Exception e) {
-			throw new UsernameNotFoundException("Invalid user");
+		} catch (Exception e) {
+			throw new UsernameNotFoundException("User not found");
 		}
 	}
 	
@@ -50,4 +49,5 @@ public class UserService implements UserDetailsService {
 		
 		return user;
 	}
+
 }

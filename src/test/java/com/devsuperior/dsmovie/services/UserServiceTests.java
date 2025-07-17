@@ -21,6 +21,7 @@ import com.devsuperior.dsmovie.entities.UserEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration
@@ -51,16 +52,29 @@ public class UserServiceTests {
 		Mockito.when(repository.searchUserAndRolesByUsername(existingUsername)).thenReturn(userDetails);
 		Mockito.when(repository.searchUserAndRolesByUsername(nonExistingUsername)).thenReturn(new ArrayList<>());
 
+		Mockito.when(repository.findByUsername(existingUsername)).thenReturn(Optional.of(user));
+		Mockito.when(repository.findByUsername(nonExistingUsername)).thenReturn(Optional.empty());
 	}
 
 	@Test
 	public void authenticatedShouldReturnUserEntityWhenUserExists() {
 
+		Mockito.when(userUtil.getLoggedUsername()).thenReturn(existingUsername);
 
+		UserEntity result = service.authenticated();
+
+		Assertions.assertNotNull(result);
+		Assertions.assertEquals(result.getUsername(), existingUsername);
 	}
 
 	@Test
 	public void authenticatedShouldThrowUsernameNotFoundExceptionWhenUserDoesNotExists() {
+
+		Mockito.doThrow(UsernameNotFoundException.class).when(userUtil).getLoggedUsername();
+
+		Assertions.assertThrows(UsernameNotFoundException.class, () -> {
+			service.authenticated();
+		});
 	}
 
 	@Test
