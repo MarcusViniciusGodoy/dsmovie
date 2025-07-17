@@ -3,6 +3,7 @@ package com.devsuperior.dsmovie.services;
 import com.devsuperior.dsmovie.dto.MovieDTO;
 import com.devsuperior.dsmovie.entities.MovieEntity;
 import com.devsuperior.dsmovie.repositories.MovieRepository;
+import com.devsuperior.dsmovie.services.exceptions.DatabaseException;
 import com.devsuperior.dsmovie.services.exceptions.ResourceNotFoundException;
 import com.devsuperior.dsmovie.tests.MovieFactory;
 import jakarta.persistence.EntityNotFoundException;
@@ -48,6 +49,7 @@ public class MovieServiceTests {
 
 		movie = MovieFactory.createMovieEntity();
 		movieName = movie.getTitle();
+		movieDTO = new MovieDTO(movie);
 		page = new PageImpl<>(List.of(movie));
 
 		Mockito.when(repository.findById(existingMovieId)).thenReturn(Optional.of(movie));
@@ -100,25 +102,52 @@ public class MovieServiceTests {
 	
 	@Test
 	public void insertShouldReturnMovieDTO() {
+
+		MovieDTO result = service.insert(movieDTO);
+
+		Assertions.assertNotNull(result);
+		Assertions.assertEquals(result.getId(), movie.getId());
 	}
 	
 	@Test
 	public void updateShouldReturnMovieDTOWhenIdExists() {
+
+		MovieDTO result = service.update(existingMovieId, movieDTO);
+
+		Assertions.assertNotNull(result);
+		Assertions.assertEquals(result.getId(), existingMovieId);
+		Assertions.assertEquals(result.getTitle(), movieDTO.getTitle());
 	}
 	
 	@Test
 	public void updateShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
+
+		Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+			service.update(nonExistingMovieId, movieDTO);
+		});
 	}
 	
 	@Test
 	public void deleteShouldDoNothingWhenIdExists() {
+
+		Assertions.assertDoesNotThrow(() -> {
+			service.delete(existingMovieId);
+		});
 	}
 	
 	@Test
 	public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
+
+		Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+			service.delete(nonExistingMovieId);
+		});
 	}
 	
 	@Test
 	public void deleteShouldThrowDatabaseExceptionWhenDependentId() {
+
+		Assertions.assertThrows(DatabaseException.class, () -> {
+			service.delete(dependentMovieId);
+		});
 	}
 }
