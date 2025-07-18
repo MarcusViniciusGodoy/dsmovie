@@ -10,6 +10,9 @@ Este é um projeto de filmes e avaliações de filmes. A visualização dos dado
 ## UML
 ![Client](https://github.com/MarcusViniciusGodoy/assets/blob/main/dsmovie.PNG)
 
+## JaCoCo
+![Jacoco](https://github.com/MarcusViniciusGodoy/assets/blob/main/dsmovieJACOCO.PNG)
+
 # Tecnologias Utilizadas
 ## Back end
 - Java
